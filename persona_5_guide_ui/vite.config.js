@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === "production" ? "/persona5_guide/" : "/",
   plugins: [vue({
     compilerOptions : {
       whitespace: 'preserve'
