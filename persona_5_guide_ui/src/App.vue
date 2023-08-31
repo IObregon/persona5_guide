@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import data from '../public/data.json'
 import ShowTitle from './components/ShowTitle.vue';
 import ShowHeader from './components/ShowHeader.vue';
@@ -8,6 +8,21 @@ import ShowInstructions from './components/ShowInstructions.vue';
 const currentTitle = ref(0);
 const currentDay = ref(0);
 
+onBeforeMount(() => {
+  getInfoFromLocalStorage();
+});
+
+const getInfoFromLocalStorage = () => {
+  const info = JSON.parse(localStorage.getItem("info"));
+  if (info) {
+    currentTitle.value = info.currentTitle;
+    currentDay.value = info.currentDay;
+  }
+}
+
+const updateInfoInLocalStorage = () => {
+  localStorage.setItem("info", JSON.stringify({ currentTitle: currentTitle.value, currentDay: currentDay.value }));
+}
 const hasDate = () =>
   data[currentTitle.value] !== undefined &&
   data[currentTitle.value].extra !== undefined &&
@@ -25,6 +40,7 @@ const nextTitle = () => {
   }
   currentTitle.value++;
   currentDay.value = 0;
+  updateInfoInLocalStorage();
 }
 
 const prevTitle = () => {
@@ -33,25 +49,29 @@ const prevTitle = () => {
   }
   currentTitle.value--;
   currentDay.value = 0;
+  updateInfoInLocalStorage();
 }
 
 const nextDay = () => {
   if (currentDay.value + 1 > data[currentTitle.value].extra.length - 1) {
     currentDay.value = 0;
     currentTitle.value++;
+    updateInfoInLocalStorage();
     return;
   }
   currentDay.value++;
+  updateInfoInLocalStorage();
 }
 
 const prevDay = () => {
   if (currentDay.value - 1 < 0) {
     currentTitle.value--;
     currentDay.value = data[currentTitle.value].extra.length - 1;
-    console.log(currentDay.value)
+    updateInfoInLocalStorage();
     return;
   }
   currentDay.value--;
+  updateInfoInLocalStorage();
 }
 </script>
 
@@ -62,13 +82,16 @@ const prevDay = () => {
     <ShowDay v-if="hasDate()" :date="getDay().date" @nextDay="nextDay()" @prevDay="prevDay()"></ShowDay>
     <ShowInstructions v-if="hasDate()" :date="getDay()"></ShowInstructions>
     <div class="links">
-      <a href="https://psnprofiles.com/guide/11946-persona-5-royal-100-perfect-schedule#3-recommended-fusion-path" target="_blank">Recommended
-        fusion path</a> 
-      <br/>
-      <a href="https://psnprofiles.com/guide/11946-persona-5-royal#5-shadows-information" target="_blank">Shadows information</a>
+      <a href="https://psnprofiles.com/guide/11946-persona-5-royal-100-perfect-schedule#3-recommended-fusion-path"
+        target="_blank">Recommended
+        fusion path</a>
+      <br />
+      <a href="https://psnprofiles.com/guide/11946-persona-5-royal#5-shadows-information" target="_blank">Shadows
+        information</a>
     </div>
     <div class="footer">
-      All the information shown here is extracted fromm: <a href="https://psnprofiles.com/guide/11946-persona-5-royal-100-perfect-schedule">here</a>.
+      All the information shown here is extracted fromm: <a
+        href="https://psnprofiles.com/guide/11946-persona-5-royal-100-perfect-schedule">here</a>.
       This is only a easier way to show the information.
     </div>
   </div>
